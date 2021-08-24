@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charaset="UTF-8">
+    <title>Doc</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div id="app" class="div">
+        <h1>仓库管理系统</h1>
+        <form id="validate" class="form">
+            <fieldset align="center" style="width: 250px;">
+                <div class="formRow">
+                    <label for="login">用户名:</label>
+                    <div class="loginInput"><input type="text" name="login" class="validate[required]" id="login" /></div>
+                </div>
+                
+                <div class="formRow">
+                    <label for="pass">密码:</label>
+                    <div class="loginInput"><input type="password" name="password" class="validate[required]" id="pass" /></div>
+                </div>
+            </fieldset>
+        </form>
+        <div class="loginControl">
+            <!-- <div class="rememberMe"><input type="checkbox" id="remMe" name="remMe" /><label for="remMe">Remember me</label></div> -->
+            <input type="submit" value="登录" onClick="checkSubmit()" />
+            <div class="clear"></div>
+        </div>
+    </div>
+
+    <script>
+	function checkSubmit() {
+		var username = $('#login').val();
+        var password= $('#pass').val();
+        if(username == ""){
+        	alert("用户名不能为空！");
+        }
+        else{
+        	if(password == ""){
+        		alert("请输入密码！");
+        	}
+        	else{
+        	    var data = {
+        	        "username":username,
+		            "password":password
+        	    }
+        		$.ajax({
+		            type : 'post',
+		            url : '/auth/user/login',
+		            dataType:'json',
+		            data: JSON.stringify(data),
+		            success:function(dat){
+		                if (dat.code == 401){
+                            alert(dat.message);
+                        }
+                        if (dat.code == 200){
+                            console.log(dat.access);
+                            localStorage.token = 'Bearer ' + dat.access;
+                            location.href = 'upload';
+                        }
+		            },
+		            error:function(error){
+		                console.log(error);
+		                alert('网络失败，请刷新页面后重试');
+            		}
+		        })
+        	}
+        }
+	}
+    </script>
+</body>
+</html>

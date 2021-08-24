@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charaset="UTF-8">
+    <title>Doc</title>
+    <script src="http://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.19.2/axios.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>选择仓库id</h1>
+        <select v-model='storeid' name=''
+        <input type="text" v-model.lazy='ipp'>
+        <br>
+        password:
+        <input type="text" v-model.lazy='dataa'>
+        <br><br>
+        <button @click='ajaxx'>click-to-send</button>
+        <br>
+    </div>
+
+    <script>
+        var vm = new Vue
+        (
+            {
+                el:'#app',
+                data:
+                {
+                    getdata:'',
+                    ipp:'http://127.0.0.1/index',
+                    dataa:''
+                },
+                methods:
+                {
+                    ajaxx()
+                    {
+                        axios.get(this.ipp).then
+                        {
+                            res=>
+                            {
+                                console.log(res.data);
+                                this.getdata = res.data;
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    </script>
+</body>

@@ -1,0 +1,5 @@
+source "/home/ubuntu/fastapi-env/bin/activate"
+cd express-server-master/
+python main.py
+
+重启sql：service mysql restart
