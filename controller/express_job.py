@@ -244,6 +244,7 @@ def update_express_job_lock_status(*, express_job: ExpressJobSchema, auth_data: 
                 r_id = existing_object.id
                 exist_lock_status = existing_object.lock_status
                 exist_station_id = existing_object.station_id
+                # exist_station_id:当前加锁的station_id
         if r_id >= 0 and express_job.station_id is not None and len(express_job.station_id) > 0:
             if exist_lock_status == 1:
                 if express_job.lock_status == 0:
@@ -253,11 +254,13 @@ def update_express_job_lock_status(*, express_job: ExpressJobSchema, auth_data: 
                         express_job_data.lock_status = express_job.lock_status
                         express_job_data.station_id = ''
                         ExpressJobService(auth_data).update(express_job_data)
-                        return success(None, 'Success,解锁成功')
+                        data = {'lock_status': 0, 'station_id': 'express_job_data.station_id'}
+                        return success(data, 'Success,解锁成功')
                     else:
-                        return error(msg='无权解锁')
+                        data = {'lock_status': 1, 'station_id': 'exist_station_id'}
+                        return error(data, '无权解锁')
                 else:
-                    return error(msg='请求参数无效，当前锁定状态已经是锁定状态')
+                    return error(msg='参数错误，当前已是锁定状态')
             elif exist_lock_status == 0:
                 if express_job.lock_status == 1:
                     express_job_data = ExpressJobSchema()
@@ -265,9 +268,11 @@ def update_express_job_lock_status(*, express_job: ExpressJobSchema, auth_data: 
                     express_job_data.station_id = express_job.station_id
                     express_job_data.lock_status = express_job.lock_status
                     ExpressJobService(auth_data).update(express_job_data)
-                    return success(None, 'Success，锁定成功')
+                    data = {'lock_status': 1, 'station_id': 'express_job_data.station_id'}
+                    return success(data, 'Success，锁定成功')
                 else:
-                    return error(msg='请求参数无效，当前锁定状态已经是解锁状态')
+                    data = {'lock_status': 0, 'station_id': ''}
+                    return error(data, '参数错误，当前已是解锁状态')
         else:
             return error(msg='请求参数无效')
     else:
