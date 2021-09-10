@@ -13,7 +13,8 @@ class FastapiConfig:
     res_path = 'res'
     request_log_to_mongo = True
     MEDIA_ROOT = "./"   # excel保存目录
-    express_addr = 'https://sfapi-sbox.sf-express.com/std/service'
+    express_addr_sbox = 'https://sfapi-sbox.sf-express.com/std/service'
+    express_addr_true = 'https://sfapi.sf-express.com/std/service'
     partnerID = 'GLSTXt'
     checkword = 'hojUhAJ6Q5Ta3WfMrITN1sa7zPW6r0op'
     monthlyCard = '7551234567'  #顺丰月结卡号
