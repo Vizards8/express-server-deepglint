@@ -254,13 +254,14 @@ def update_express_job_lock_status(*, express_job: ExpressJobSchema, auth_data: 
                         express_job_data.lock_status = express_job.lock_status
                         express_job_data.station_id = ''
                         ExpressJobService(auth_data).update(express_job_data)
-                        data = {'lock_status': 0, 'station_id': 'express_job_data.station_id'}
+                        data = {'lock_status': 0, 'station_id': express_job_data.station_id}
                         return success(data, 'Success,解锁成功')
                     else:
-                        data = {'lock_status': 1, 'station_id': 'exist_station_id'}
+                        data = {'lock_status': 1, 'station_id': exist_station_id}
                         return error(data, '无权解锁')
                 else:
-                    return error(msg='参数错误，当前已是锁定状态')
+                    data = {'lock_status': 1, 'station_id': exist_station_id}
+                    return error(data, msg='参数错误，当前已是锁定状态')
             elif exist_lock_status == 0:
                 if express_job.lock_status == 1:
                     express_job_data = ExpressJobSchema()
@@ -268,7 +269,7 @@ def update_express_job_lock_status(*, express_job: ExpressJobSchema, auth_data: 
                     express_job_data.station_id = express_job.station_id
                     express_job_data.lock_status = express_job.lock_status
                     ExpressJobService(auth_data).update(express_job_data)
-                    data = {'lock_status': 1, 'station_id': 'express_job_data.station_id'}
+                    data = {'lock_status': 1, 'station_id': express_job_data.station_id}
                     return success(data, 'Success，锁定成功')
                 else:
                     data = {'lock_status': 0, 'station_id': ''}
