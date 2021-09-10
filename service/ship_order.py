@@ -15,7 +15,10 @@ class OrderService:
         pass
 
     def order(self, express_job, send_store, express_order):
-        req_url = '%s' % FastapiConfig.express_addr
+        if express_order.test:
+            req_url = '%s' % FastapiConfig.express_addr_sbox
+        else:
+            req_url = '%s' % FastapiConfig.express_addr_true
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
         monthly_card = '%s' % FastapiConfig.monthlyCard
@@ -82,7 +85,10 @@ class OrderService:
         return res
 
     def sub_order(self, express_order):
-        req_url = '%s' % FastapiConfig.express_addr
+        if express_order.test:
+            req_url = '%s' % FastapiConfig.express_addr_sbox
+        else:
+            req_url = '%s' % FastapiConfig.express_addr_true
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
         # monthly_card = '%s' % FastapiConfig.monthlyCard
@@ -118,7 +124,10 @@ class OrderService:
         return res
 
     def cancel_order(self, cancel_order):
-        req_url = '%s' % FastapiConfig.express_addr
+        if express_order.test:
+            req_url = '%s' % FastapiConfig.express_addr_sbox
+        else:
+            req_url = '%s' % FastapiConfig.express_addr_true
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
 
