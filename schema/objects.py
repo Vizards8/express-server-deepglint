@@ -92,6 +92,7 @@ class OrderSchema(BaseModel):
     parcel_qty: Optional[int] = 1
     station_id: Optional[str] = ''
     device_count: List[DeviceCountSchema] = None  # 字段条件
+    test = True  # 测试字段，True使用顺丰沙盒接口，反之使用实际生产接口
 
 
 class SubOrderSchema(BaseModel):
