@@ -17,11 +17,12 @@ class OrderService:
     def order(self, express_job, send_store, express_order):
         if express_order.test:
             req_url = '%s' % FastapiConfig.express_addr_sbox
+            monthly_card = '%s' % FastapiConfig.monthlyCard
         else:
             req_url = '%s' % FastapiConfig.express_addr_true
+            monthly_card = '%s' % FastapiConfig.monthlyCard_true
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
-        monthly_card = '%s' % FastapiConfig.monthlyCard
 
         order_id = express_job.order_id
         service_code = "EXP_RECE_CREATE_ORDER"

@@ -5,6 +5,7 @@ from fastapi import Depends, APIRouter
 
 from application.controller import error, success
 from application.logger import get_controller_logger
+from schema.base import ListArgsSchema, ListFilterSchema, ListOrderSchema
 from schema.objects import OrderSchema, CancelOrderSchema, DeviceSchema
 from service.device_list import DeviceListService
 from service.express_job import ExpressJobService
@@ -373,15 +374,33 @@ def delete_express_order(*, express_order: CancelOrderSchema, auth_data: dict = 
                         shipment_sub_id = waybillNoInfo['waybillNo']
                         waybillType = waybillNoInfo['waybillType']  # 运单号类型1：母单 2 :子单 3 : 签回单
                         # delete device table
-                        device = DeviceSchema()
-                        existing_object = None
+                        existing_objects = None
+                        args = ListArgsSchema()
+                        args.filters = []
+
                         if waybillType == 2:
-                            device.shipment_sub_id = shipment_sub_id
-                            existing_object = DeviceListService(auth_data).get_one(express_order.device_sn_list)
+                            q_filter = ListFilterSchema(key='shipment_sub_id', condition='=', value=shipment_sub_id)
+                            args.filters.append(q_filter)
                         elif waybillType == 1:
-                            existing_object = DeviceListService(auth_data).get_one(express_order.device_sn_list)
-                        if existing_object is not None:
-                            DeviceListService(auth_data).delete(existing_object.id)
+                            q_filter = ListFilterSchema(key='shipment_id', condition='=', value=shipment_sub_id)
+                            args.filters.append(q_filter)
+
+                        args.user_id = auth_data.get('user_id')
+                        LOGGER.debug('Get  Data list ')
+                        if len(args.filters) > 0:
+                            existing_objects = DeviceListService(auth_data).list(args)
+                            if existing_objects is not None:
+                                for device in existing_objects:
+                                    DeviceListService(auth_data).delete(df['id'])
+                            else:
+                                return error(msg='查询不到sn_list')
+
+                        # cancel all order
+                        if waybillType == 1:
+                            express_job.status = 0
+                            express_job.shipment_id = None
+                            ExpressJobService(auth_data).update_by_model(express_job)
+
                     return success(apiResultData, 'Success')
                 else:
                     # cancel all order

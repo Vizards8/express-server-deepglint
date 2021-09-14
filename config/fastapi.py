@@ -12,9 +12,10 @@ class FastapiConfig:
     swagger_ui_init_oauth = None
     res_path = 'res'
     request_log_to_mongo = True
-    MEDIA_ROOT = "./"   # excel保存目录
+    MEDIA_ROOT = "./"  # excel保存目录
     express_addr_sbox = 'https://sfapi-sbox.sf-express.com/std/service'
     express_addr_true = 'https://sfapi.sf-express.com/std/service'
     partnerID = 'GLSTXt'
     checkword = 'hojUhAJ6Q5Ta3WfMrITN1sa7zPW6r0op'
-    monthlyCard = '7551234567'  #顺丰月结卡号
+    monthlyCard = '7551234567'  # 顺丰月结卡号
+    monthlyCard_true = '0210148124'  # 上海顺丰月结卡号

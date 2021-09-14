@@ -110,5 +110,5 @@ class CancelOrderSchema(BaseModel):
     dispatch_id: Optional[str] = ''
     order_id: Optional[str] = None  # 客户订单号
     dealType: Optional[int] = 2  # 客户订单操作标识,1:确认 ,2:取消
-    waybillNoInfoList: List[WaybillSchema] = None  # 字段条件
+    waybillNoInfoList: Optional[List[WaybillSchema]] = None  # 字段条件
     station_id: Optional[str] = ''
