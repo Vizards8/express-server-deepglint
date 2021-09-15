@@ -204,12 +204,12 @@ def create_table():
     sql = """
         insert into t_send_store(store_id, address, city, company, contact, county, mobile) VALUES(
         '04002',
-        '上海市嘉定区恒永路与银龙路交叉路口往东南约150米', 
-        '上海市',
-        '上海复珊精密制造有限公司',
-        '小周',
-        '嘉定区',
-        '18912341234'
+        '北京市海淀区天地邻枫产业园1号楼B栋', 
+        '北京市',
+        '北京格灵深瞳信息技术股份有限公司',
+        '樊成水',
+        '海淀区',
+        '15116960344'
         )
     """
     try:
