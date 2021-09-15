@@ -417,26 +417,20 @@ def delete_express_order(*, express_order: CancelOrderSchema, auth_data: dict = 
         return error(data=order_result, msg=order_result['apiErrorMsg'])
 
 
-@router.post('/api/express/search_order')
-def search_express_order(*, express_order: OrderSchema, auth_data: dict = Depends(get_auth_data)):
-    dispatch_id = express_order.dispatch_id
-    if dispatch_id is None:
+@router.get('/api/express/search_order')
+def search_express_order(*, dispatch_id: Optional[str] = '', auth_data: dict = Depends(get_auth_data)):
+    if not dispatch_id:
         return error(msg='请求dispatch_id参数为空')
 
     express_job = ExpressJobService(auth_data).get_one(dispatch_id)
     if express_job is None:
         return error(msg='dispatch_id 无效')
 
-    order_id = express_order.order_id
-    if order_id is None or len(order_id) == 0:
-        order_id = express_job.order_id
-        if order_id is not None and len(order_id) > 0:
-            express_order.order_id = order_id
-
+    order_id = express_job.order_id
     if order_id is None:
         return error(msg='请求order_id参数为空')
 
-    res = OrderService().search_order(express_order)
+    res = OrderService().search_order(order_id)
     order_result = json.loads(str(res.content, 'utf8'))
     if res.status_code == 200:
         apiResultCode = order_result['apiResultCode']
