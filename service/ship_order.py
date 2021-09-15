@@ -163,13 +163,32 @@ class OrderService:
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
 
-        service_code = "EXP_RECE_UPDATE_ORDER"
+        service_code = "EXP_RECE_SEARCH_ORDER_RESP"
         request_id = str(uuid.uuid1())  # 生成uuid
         timestamp = str(int(time.time()))  # 获取时间戳
 
         msg_data = {
             "searchType": "1",
-            "orderId": order_id,
+            "orderId": order_id
+        }
+        encoded_msg_data = json.dumps(msg_data)
+        res = self.callSfExpressServiceByCSIM(req_url, partner_id, request_id, service_code, timestamp,
+                                              encoded_msg_data,
+                                              check_word)
+        return res
+
+    def check_order(self, shipment_id):
+        req_url = '%s' % FastapiConfig.express_addr_true
+        partner_id = '%s' % FastapiConfig.partnerID
+        check_word = '%s' % FastapiConfig.checkword
+
+        service_code = "EXP_RECE_SEARCH_ROUTES"
+        request_id = str(uuid.uuid1())  # 生成uuid
+        timestamp = str(int(time.time()))  # 获取时间戳
+
+        msg_data = {
+            "trackingType": "1",
+            "trackingNumber": [shipment_id]
         }
         encoded_msg_data = json.dumps(msg_data)
         res = self.callSfExpressServiceByCSIM(req_url, partner_id, request_id, service_code, timestamp,

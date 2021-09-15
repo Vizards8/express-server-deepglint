@@ -10,6 +10,7 @@ from schema.objects import ExpressJobSchema, ExpressProductSchema, ExpressJobPro
 from service.device_list import DeviceListService
 from service.express_job import ExpressJobService
 from service.express_product import ExpressProductService
+from service.ship_order import OrderService
 from utils.auth import get_auth_data
 from utils.redis import RedisUtils
 import pandas as pd
@@ -28,6 +29,9 @@ def get_express_job(dispatch_id: Optional[str] = '', shipment_id: Optional[str] 
     Args:
     args: 列表请求参数，详见ListArgsSchema
     """
+    # 已揽件的标记status = 3
+    check_job(auth_data)
+
     args = ListArgsSchema()
     args.size = page_size
     args.page = page_index
@@ -72,6 +76,8 @@ def get_express_job(dispatch_id: Optional[str] = '', shipment_id: Optional[str] 
             status = 1
         elif status == 2:
             status = 2
+        elif status == 3:
+            status = 3
         q_filter = ListFilterSchema(key='status', condition='=', value=status)
         args.filters.append(q_filter)
     else:
@@ -171,7 +177,7 @@ def create_express_job(express_job_product: ExpressJobProductSchema, auth_data):
         if existing_object is None:
             ExpressJobService(auth_data).create(express_job_data)
         # else:
-            # ExpressJobService(auth_data).update(express_job_data)
+        # ExpressJobService(auth_data).update(express_job_data)
 
         express_product_data = ExpressProductSchema()
         # 一个出库单下面的产品有可能重复
@@ -187,7 +193,7 @@ def create_express_job(express_job_product: ExpressJobProductSchema, auth_data):
         if existing_product_object is None:
             ExpressProductService(auth_data).create(express_product_data)
         # else:
-            # ExpressProductService(auth_data).update(express_product_data)
+        # ExpressProductService(auth_data).update(express_product_data)
 
         return success(None, 'Success')
     else:
@@ -397,3 +403,49 @@ def get_express_sn(product_id: Optional[str] = '', dispatch_id: Optional[str] = 
             return success(json_obj)
     else:
         return error(msg='请求参数为空')
+
+
+def check_job(auth_data):
+    args = ListArgsSchema()
+    args.filters = []
+
+    q_filter = ListFilterSchema(key='status', condition='=', value=2)
+    args.filters.append(q_filter)
+    args.user_id = auth_data.get('user_id')
+
+    express_jobs = ExpressJobService(auth_data).list(args)
+
+    if express_jobs is not None:
+        express_jobs = express_jobs.to_json(orient="records", force_ascii=False, date_format='iso')
+        express_jobs = json.loads(express_jobs)
+        for express_job in express_jobs:
+            res = OrderService().check_order(express_job['shipment_id'])
+            order_result = json.loads(str(res.content, 'utf8'))
+            if res.status_code == 200:
+                apiResultCode = order_result['apiResultCode']
+                if apiResultCode != 'A1000':
+                    return print(order_result['apiErrorMsg'])
+                elif order_result['apiResultData'] is not None:
+                    apiResultDataStr = order_result['apiResultData']
+                    apiResultData = json.loads(apiResultDataStr)
+                    if apiResultData['errorCode'] is not None and apiResultData['errorCode'] == 'S0000' \
+                            and apiResultData['msgData'] is not None:
+                        msgData = apiResultData['msgData']
+                        routes = msgData['routeResps'][0]['routes']
+                        if routes is not None:
+                            for route in routes:
+                                if route['opcode'] == "50":
+                                    express_job['status'] = 3
+                        else:
+                            print('尚未揽件')
+                    else:
+                        print('api error')
+                else:
+                    print('api error')
+            else:
+                print('api error')
+            if express_job['status'] == 3:
+                print('update job: ' + express_job['id'])
+                ExpressJobService(auth_data).update_by_model(express_job)
+        else:
+            print('下了订单却没有shipment_id?')
