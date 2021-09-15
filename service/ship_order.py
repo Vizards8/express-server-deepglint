@@ -166,7 +166,7 @@ class OrderService:
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
 
-        order_id = cancel_order.order_id
+        order_id = express_order.order_id
 
         service_code = "EXP_RECE_UPDATE_ORDER"
         request_id = str(uuid.uuid1())  # 生成uuid
@@ -174,7 +174,7 @@ class OrderService:
 
         msg_data = {
             "searchType": "1",
-            "orderId": express_order.order_id,
+            "orderId": order_id,
         }
         encoded_msg_data = json.dumps(msg_data)
         res = self.callSfExpressServiceByCSIM(req_url, partner_id, request_id, service_code, timestamp, encoded_msg_data,

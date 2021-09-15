@@ -439,17 +439,26 @@ def search_express_order(*, express_order: OrderSchema, auth_data: dict = Depend
     res = OrderService().search_order(express_order)
     order_result = json.loads(str(res.content, 'utf8'))
     if res.status_code == 200:
-        if order_result['errorCode'] is not None and order_result['errorCode'] == 'S0000' \
-                and order_result['msgData'] is not None:
-            msgData = order_result['msgData']
-            waybillNoInfoList = msgData['waybillNoInfoList']
-            routeLabelInfo = msgData['routeLabelInfo']
-            if waybillNoInfoList is not None and len(waybillNoInfoList) > 0:
-                res = {'waybillNoInfoList': waybillNoInfoList, 'routeLabelInfo': routeLabelInfo}
-                return success(res, 'Success')
+        apiResultCode = order_result['apiResultCode']
+        if apiResultCode != 'A1000':
+            return error(data=order_result, msg=order_result['apiErrorMsg'])
+        elif order_result['apiResultData'] is not None:
+            apiResultDataStr = order_result['apiResultData']
+            apiResultData = json.loads(apiResultDataStr)
+
+            if apiResultData['errorCode'] is not None and apiResultData['errorCode'] == 'S0000' \
+                    and apiResultData['msgData'] is not None:
+                msgData = apiResultData['msgData']
+                waybillNoInfoList = msgData['waybillNoInfoList']
+                routeLabelInfo = msgData['routeLabelInfo']
+                if waybillNoInfoList is not None and len(waybillNoInfoList) > 0:
+                    res = {'waybillNoInfoList': waybillNoInfoList, 'routeLabelInfo': routeLabelInfo}
+                    return success(res, 'Success')
+                else:
+                    return error(data=apiResultData, msg='there is no waybillNo')
             else:
-                return error(data=order_result, msg='there is no waybillNo')
+                return error(data=apiResultData, msg=order_result['apiErrorMsg'])
         else:
-            return error(data=order_result, msg=order_result['errorMsg'])
+            return error(data=order_result, msg=order_result['apiErrorMsg'])
     else:
         return error(data=order_result, msg=order_result['apiErrorMsg'])
