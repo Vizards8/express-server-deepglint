@@ -418,7 +418,7 @@ def delete_express_order(*, express_order: CancelOrderSchema, auth_data: dict = 
 
 
 @router.get('/api/express/search_order')
-def search_express_order(*, dispatch_id: Optional[str] = '', auth_data: dict = Depends(get_auth_data)):
+def search_express_order(*, dispatch_id: str = '', auth_data: dict = Depends(get_auth_data)):
     if not dispatch_id:
         return error(msg='请求dispatch_id参数为空')
 
