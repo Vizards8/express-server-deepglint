@@ -174,7 +174,8 @@ def create_express_order(express_order: OrderSchema, auth_data):
                                 existing_product_object.packed_count = existing_product_object.packed_count + count
                                 ExpressProductService(auth_data).update_by_model(existing_product_object)
 
-                        res = {'waybillNoInfoList': waybillNoInfoList, 'routeLabelData': msgData['routeLabelInfo'][0]['routeLabelData']}
+                        res = {'waybillNoInfoList': waybillNoInfoList,
+                               'routeLabelData': msgData['routeLabelInfo'][0]['routeLabelData']}
                         return success(res, 'Success')  # 如果返回信息中无地址，需要从Expreess_job中找到返回给前端，供打印
                     else:
                         return error(msg='请求device_count参数为空')
@@ -412,5 +413,43 @@ def delete_express_order(*, express_order: CancelOrderSchema, auth_data: dict = 
                 return error(data=apiResultData, msg=apiResultData['errorMsg'])
         else:
             return error(data=order_result, msg=order_result['apiErrorMsg'])
+    else:
+        return error(data=order_result, msg=order_result['apiErrorMsg'])
+
+
+@router.post('/api/express/search_order')
+def search_express_order(*, express_order: OrderSchema, auth_data: dict = Depends(get_auth_data)):
+    dispatch_id = express_order.dispatch_id
+    if dispatch_id is None:
+        return error(msg='请求dispatch_id参数为空')
+
+    express_job = ExpressJobService(auth_data).get_one(dispatch_id)
+    if express_job is None:
+        return error(msg='dispatch_id 无效')
+
+    order_id = express_order.order_id
+    if order_id is None or len(order_id) == 0:
+        order_id = express_job.order_id
+        if order_id is not None and len(order_id) > 0:
+            express_order.order_id = order_id
+
+    if order_id is None:
+        return error(msg='请求order_id参数为空')
+
+    res = OrderService().search_order(express_order)
+    order_result = json.loads(str(res.content, 'utf8'))
+    if res.status_code == 200:
+        if order_result['errorCode'] is not None and order_result['errorCode'] == 'S0000' \
+                and order_result['msgData'] is not None:
+            msgData = order_result['msgData']
+            waybillNoInfoList = msgData['waybillNoInfoList']
+            routeLabelInfo = msgData['routeLabelInfo']
+            if waybillNoInfoList is not None and len(waybillNoInfoList) > 0:
+                res = {'waybillNoInfoList': waybillNoInfoList, 'routeLabelInfo': routeLabelInfo}
+                return success(res, 'Success')
+            else:
+                return error(data=order_result, msg='there is no waybillNo')
+        else:
+            return error(data=order_result, msg=order_result['errorMsg'])
     else:
         return error(data=order_result, msg=order_result['apiErrorMsg'])
