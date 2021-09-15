@@ -19,3 +19,4 @@ class FastapiConfig:
     checkword = 'hojUhAJ6Q5Ta3WfMrITN1sa7zPW6r0op'
     monthlyCard = '7551234567'  # 顺丰月结卡号
     monthlyCard_true = '0210148124'  # 上海顺丰月结卡号
+    sendStartTm = '15:00:00'  # 要求上门取件开始时间

@@ -23,6 +23,7 @@ class OrderService:
             monthly_card = '%s' % FastapiConfig.monthlyCard_true
         partner_id = '%s' % FastapiConfig.partnerID
         check_word = '%s' % FastapiConfig.checkword
+        sendStartTm = '%s' % FastapiConfig.sendStartTm
 
         order_id = express_job.order_id
         service_code = "EXP_RECE_CREATE_ORDER"
@@ -76,6 +77,7 @@ class OrderService:
                    'language': "zh-CN",
                    'monthlyCard': monthly_card,
                    # 'orderId': str(time.time()),
+                   'sendStartTm': time.strftime("%Y-%m-%d ", time.localtime()) + sendStartTm,  # 要求上门取件开始时间
                    'orderId': order_id,
                    'parcelQty': 1,  # 包裹数
                    'payMethod': 1,  # 付款方式
