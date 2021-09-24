@@ -15,8 +15,8 @@ class FastapiConfig:
     MEDIA_ROOT = "./"  # excel保存目录
     express_addr_sbox = 'https://sfapi-sbox.sf-express.com/std/service'
     express_addr_true = 'https://sfapi.sf-express.com/std/service'
-    partnerID = 'GLSTXt'
-    checkword = 'hojUhAJ6Q5Ta3WfMrITN1sa7zPW6r0op'
+    partnerID = 'ZNu6r9'
+    checkword = 'UQU3asqWTbd70l4cEjqWfXcpNzuJSaZr'
     monthlyCard = '7551234567'  # 顺丰月结卡号
-    monthlyCard_true = '0210148124'  # 上海顺丰月结卡号
+    monthlyCard_true = '0100004714'  # 北京顺丰月结卡号
     sendStartTm = '15:00:00'  # 要求上门取件开始时间
