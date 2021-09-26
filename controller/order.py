@@ -392,7 +392,7 @@ def delete_express_order(*, express_order: CancelOrderSchema, auth_data: dict = 
                             existing_objects = DeviceListService(auth_data).list(args)
                             if existing_objects is not None:
                                 for device in existing_objects:
-                                    DeviceListService(auth_data).delete(df['id'])
+                                    DeviceListService(auth_data).delete(device['id'])
                             else:
                                 return error(msg='查询不到sn_list')
 
