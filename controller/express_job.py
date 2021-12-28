@@ -402,8 +402,11 @@ def get_express_sn(product_id: Optional[str] = '', dispatch_id: Optional[str] = 
             df = df.to_json(orient="records", force_ascii=False, date_format='iso')
             json_obj = json.loads(df)
             res = {'routeLabelData': '', 'sn_list': json_obj}
-            main_msgData = json.loads(express_job.shipment_msg_data)['routeLabelInfo'][0]
-            res['routeLabelData'] = main_msgData['routeLabelData']
+            if express_job.shipment_msg_data:
+                main_msgData = json.loads(express_job.shipment_msg_data)['routeLabelInfo'][0]
+                res['routeLabelData'] = main_msgData['routeLabelData']
+            else:
+                res['routeLabelData'] = None
             return success(res)
     else:
         return error(msg='请求参数为空')
