@@ -369,6 +369,7 @@ def get_express_sn(product_id: Optional[str] = '', dispatch_id: Optional[str] = 
     key = ''
     if dispatch_id is not None and len(dispatch_id) > 0:
         q_filter = ListFilterSchema(key='dispatch_id', condition='=', value=dispatch_id)
+        express_job = ExpressJobService(auth_data).get_one(dispatch_id)
         args.filters.append(q_filter)
 
     if product_id is not None and len(product_id) > 0:
@@ -400,7 +401,10 @@ def get_express_sn(product_id: Optional[str] = '', dispatch_id: Optional[str] = 
             df = df.drop(['update_time'], axis=1)
             df = df.to_json(orient="records", force_ascii=False, date_format='iso')
             json_obj = json.loads(df)
-            return success(json_obj)
+            res = {'routeLabelData': '', 'sn_list': json_obj}
+            main_msgData = json.loads(express_job.shipment_msg_data)['routeLabelInfo'][0]
+            res['routeLabelData'] = main_msgData['routeLabelData']
+            return success(res)
     else:
         return error(msg='请求参数为空')
 
